@@ -89,9 +89,11 @@ Due to the nature of these experiments, it may not be feasible for individual de
 
 ### Other Notes
 
-Check out the code for the original code [here](https://github.com/noahshinn/reflexion-draft)
+Check out the original implementation [here](https://github.com/noahshinn/reflexion-draft)
 
-Read a blog post [here](https://nanothoughts.substack.com/p/reflecting-on-reflexion)
+Read one of the original blog posts [here](https://nanothoughts.substack.com/p/reflecting-on-reflexion)
+
+Check out an [Appl](https://github.com/appl-team/appl) implementation [here](https://github.com/appl-team/reppl/tree/main/reflexion).
 
 Check out an interesting type-prediction implementation here: [OpenTau](https://github.com/GammaTauAI/opentau)
 
