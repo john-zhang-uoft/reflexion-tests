@@ -2,7 +2,7 @@ from utils import enumerate_resume, make_printv, write_jsonl, resume_success_cou
 from executors import executor_factory
 from generators import generator_factory, model_factory
 
-from typing import List
+from typing import List, Optional
 
 
 def run_reflexion(
@@ -13,11 +13,12 @@ def run_reflexion(
     pass_at_k: int,
     log_path: str,
     verbose: bool,
-    is_leetcode: bool = False
+    is_leetcode: bool = False,
+    base_url: Optional[str] = None,
 ) -> None:
     exe = executor_factory(language, is_leet=is_leetcode)
     gen = generator_factory(language)
-    model = model_factory(model_name)
+    model = model_factory(model_name, base_url)
 
     print_v = make_printv(verbose)
 

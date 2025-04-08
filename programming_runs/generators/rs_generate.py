@@ -168,6 +168,7 @@ class RsGenerator(Generator):
             reflexion_completion_instruction=RS_REFLEXION_COMPLETION_INSTRUCTION,
             simple_completion_instruction=RS_SIMPLE_COMPLETION_INSTRUCTION,
             reflexion_few_shot=RS_REFLEXION_FEW_SHOT_ADD,
+            code_block_instruction=USE_RUST_CODEBLOCK_INSTRUCTION,
             parse_code_block=lambda x: parse_code_block(x, "rust"),
             add_code_block=lambda x: add_code_block(x, "rust"),
         )

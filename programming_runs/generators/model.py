@@ -1,12 +1,13 @@
 from typing import List, Union, Optional, Literal
 import dataclasses
+import os
 
 from tenacity import (
     retry,
     stop_after_attempt,  # type: ignore
     wait_random_exponential,  # type: ignore
 )
-import openai
+from openai import OpenAI
 
 MessageRole = Literal["system", "user", "assistant"]
 
@@ -33,8 +34,19 @@ def gpt_completion(
         stop_strs: Optional[List[str]] = None,
         temperature: float = 0.0,
         num_comps=1,
+        base_url: Optional[str] = None,
 ) -> Union[List[str], str]:
-    response = openai.Completion.create(
+
+    if base_url is None:
+        client = OpenAI(
+            api_key=os.environ.get("OPENAI_API_KEY"),
+        )
+    else:
+        client = OpenAI(
+            api_key=os.environ.get("OPENAI_API_KEY"),
+            base_url=base_url,
+        )
+    response = client.completions.create(
         model=model,
         prompt=prompt,
         temperature=temperature,
@@ -46,9 +58,9 @@ def gpt_completion(
         n=num_comps,
     )
     if num_comps == 1:
-        return response.choices[0].text  # type: ignore
+        return response.choices[0].text
 
-    return [choice.text for choice in response.choices]  # type: ignore
+    return [choice.text for choice in response.choices]
 
 
 @retry(wait=wait_random_exponential(min=1, max=180), stop=stop_after_attempt(6))
@@ -58,8 +70,18 @@ def gpt_chat(
     max_tokens: int = 1024,
     temperature: float = 0.0,
     num_comps=1,
+    base_url: Optional[str] = None,
 ) -> Union[List[str], str]:
-    response = openai.ChatCompletion.create(
+    if base_url is None:
+        client = OpenAI(
+            api_key=os.environ.get("OPENAI_API_KEY"),
+        )
+    else:
+        client = OpenAI(
+            api_key=os.environ.get("OPENAI_API_KEY"),
+            base_url=base_url,
+        )
+    response = client.chat.completions.create(
         model=model,
         messages=[dataclasses.asdict(message) for message in messages],
         max_tokens=max_tokens,
@@ -70,15 +92,16 @@ def gpt_chat(
         n=num_comps,
     )
     if num_comps == 1:
-        return response.choices[0].message.content  # type: ignore
+        return response.choices[0].message.content
 
-    return [choice.message.content for choice in response.choices]  # type: ignore
+    return [choice.message.content for choice in response.choices]
 
 
 class ModelBase():
-    def __init__(self, name: str):
+    def __init__(self, name: str, base_url: Optional[str] = None):
         self.name = name
         self.is_chat = False
+        self.base_url = base_url
 
     def __repr__(self) -> str:
         return f'{self.name}'
@@ -91,12 +114,13 @@ class ModelBase():
 
 
 class GPTChat(ModelBase):
-    def __init__(self, model_name: str):
+    def __init__(self, model_name: str, base_url: Optional[str] = None):
         self.name = model_name
         self.is_chat = True
+        self.base_url = base_url
 
     def generate_chat(self, messages: List[Message], max_tokens: int = 1024, temperature: float = 0.2, num_comps: int = 1) -> Union[List[str], str]:
-        return gpt_chat(self.name, messages, max_tokens, temperature, num_comps)
+        return gpt_chat(self.name, messages, max_tokens, temperature, num_comps, self.base_url)
 
 
 class GPT4(GPTChat):
@@ -108,6 +132,9 @@ class GPT35(GPTChat):
     def __init__(self):
         super().__init__("gpt-3.5-turbo")
 
+class OpenAI_API_Chat_Model(GPTChat):
+    def __init__(self, model_name: str, base_url: Optional[str] = None):
+        super().__init__(model_name, base_url)
 
 class GPTDavinci(ModelBase):
     def __init__(self, model_name: str):

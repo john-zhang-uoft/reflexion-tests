@@ -2,6 +2,7 @@ import os
 import signal
 import subprocess
 import json
+import re
 
 from .executor_utils import timeout_handler
 from .executor_types import ExecuteResult, Executor
@@ -176,6 +177,28 @@ class RsExecutor(Executor):
         TODO: do it actually
         """
         tmp_dir, tmp_path = create_temp_project()
+        
+        # Check if both func and test contain main functions
+        func_has_main = "fn main(" in func or "fn main (" in func
+        test_has_main = "fn main(" in test or "fn main (" in test
+        
+        # If both have main functions, we need to handle this conflict
+        if func_has_main and test_has_main:
+            # Extract the content of the test main function
+            test_main_content = None
+            main_match = re.search(r'fn\s+main\s*\(\s*\)\s*\{([\s\S]*?)\}', test)
+            if main_match:
+                test_main_content = main_match.group(1).strip()
+                
+                # Remove the main function from the test
+                test = re.sub(r'fn\s+main\s*\(\s*\)\s*\{[\s\S]*?\}', '', test)
+                
+                # Add the test content to the end of the function implementation
+                if test_main_content:
+                    # Remove the last closing brace of the main function in func
+                    if func.rstrip().endswith('}'):
+                        func = func.rstrip()[:-1] + '\n    ' + test_main_content + '\n}'
+        
         print(f"Evaluating\n{func + test}", flush=True)
         write_to_file_toplevel(tmp_path, func + test)
 

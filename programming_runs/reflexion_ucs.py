@@ -4,7 +4,7 @@ from utils import enumerate_resume, write_jsonl
 from executors import executor_factory
 from generators import generator_factory, model_factory
 
-from typing import List, Set, Tuple
+from typing import List, Set, Tuple, Optional
 
 
 DEBUG = True
@@ -48,11 +48,12 @@ def run_reflexion_ucs(
     log_path: str,
     verbose: bool,
     expansion_factor: int,
-    is_leetcode: bool = False
+    is_leetcode: bool = False,
+    base_url: Optional[str] = None
 ) -> None:
     exe = executor_factory(language, is_leet=is_leetcode)
     gen = generator_factory(language)
-    model = model_factory(model_name)
+    model = model_factory(model_name, base_url)
 
     num_items = len(dataset)
     num_success = 0

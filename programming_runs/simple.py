@@ -2,7 +2,7 @@ from utils import enumerate_resume, make_printv, write_jsonl
 from executors import executor_factory
 from generators import generator_factory, model_factory
 
-from typing import List
+from typing import List, Optional
 
 SIMPLE_COMPLETION_INSTRUCTION = "# Write the body of this function only."
 SIMPLE_CHAT_INSTRUCTION = "You are a programming assistant. You will be given a function signature and docstring. You should fill in the following text of the missing function body. For example, the first line of the completion should have 4 spaces for the indendation so that it fits syntactically with the preceding signature."
@@ -14,11 +14,12 @@ def run_simple(
         pass_at_k: int,
         log_path: str,
         verbose: bool,
-        is_leetcode: bool = False
+        is_leetcode: bool = False,
+        base_url: Optional[str] = None
     ) -> None:
     exe = executor_factory(language, is_leet=is_leetcode)
     gen = generator_factory(language)
-    model = model_factory(model_name)
+    model = model_factory(model_name, base_url)
 
     print_v = make_printv(verbose)
     

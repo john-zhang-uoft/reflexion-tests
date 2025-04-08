@@ -1,8 +1,8 @@
 from utils import enumerate_resume, write_jsonl, make_printv
 from executors import executor_factory
-from generators import generator_factory
+from generators import generator_factory, model_factory
 
-from typing import List
+from typing import List, Optional
 
 
 def run_test_acc(
@@ -12,10 +12,12 @@ def run_test_acc(
     pass_at_k: int,
     log_path: str,
     verbose: bool,
-    is_leetcode: bool = False
+    is_leetcode: bool = False,
+    base_url: Optional[str] = None,
 ) -> None:
     exe = executor_factory(language, is_leet=is_leetcode)
     gen = generator_factory(language)
+    model_obj = model_factory(model, base_url)
 
     print_v = make_printv(verbose)
 
@@ -26,7 +28,7 @@ def run_test_acc(
         is_solved = False
         tests_i = []
         while cur_pass < pass_at_k:
-            tests_i = gen.internal_tests(item["prompt"], model, 1)
+            tests_i = gen.internal_tests(item["prompt"], model_obj, 1)
             print_v(tests_i)
 
             cur_func_impl = item["prompt"] + item["canonical_solution"]

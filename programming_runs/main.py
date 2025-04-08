@@ -22,6 +22,7 @@ def get_args():
     parser.add_argument("--language", type=str, help="Strategy: `py` or `rs`")
     parser.add_argument(
         "--model", type=str, help="OpenAI models only for now. For best results, use GPT-4")
+    parser.add_argument("--base_url", type=str, help="The base URL for the OpenAI API", default=None)
     parser.add_argument("--pass_at_k", type=int,
                         help="Pass@k metric", default=1)
     parser.add_argument("--max_iters", type=int,
@@ -34,6 +35,7 @@ def get_args():
 
     parser.add_argument("--verbose", action='store_true',
                         help="To print live logs")
+    
     # TODO: implement this
     # parser.add_argument("--is_resume", action='store_true', help="To resume run")
     # parser.add_argument("--resume_dir", type=str, help="If resume, the logging directory", default="")
@@ -115,7 +117,8 @@ pass@k: {args.pass_at_k}
         log_path=log_path,
         verbose=args.verbose,
         expansion_factor=args.expansion_factor,
-        is_leetcode=args.is_leetcode
+        is_leetcode=args.is_leetcode,
+        base_url=args.base_url,
     )
 
     print(f"Done! Check out the logs in `{log_path}`")
